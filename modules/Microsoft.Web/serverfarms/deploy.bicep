@@ -1,5 +1,5 @@
 // ================ //
-// Parameters       //
+// Parameters      //
 // ================ //
 @description('Required. The name of the app service plan to deploy.')
 @minLength(1)
