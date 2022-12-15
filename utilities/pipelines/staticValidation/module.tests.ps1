@@ -141,8 +141,7 @@ Describe 'File/folder tests' -Tag Modules {
             }
         }
 
-        It '[<moduleFolderName>] JSON test files in the .test folder should be valid json' -TestCases {
-            $testFolderFilesTestCases | Where-Object { (Split-Path $_.testFilePath -Extension) -eq '.json' } } {
+        It '[<moduleFolderName>] JSON test files in the .test folder should be valid json' -TestCases $testFolderFilesTestCases {
 
             param(
                 [string] $moduleFolderName,
