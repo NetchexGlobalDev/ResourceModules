@@ -1,3 +1,4 @@
+// Trigger Deploy: 2022-12-15 10:54:17
 @maxLength(24)
 @description('Required. Name of the Storage Account.')
 param name string
