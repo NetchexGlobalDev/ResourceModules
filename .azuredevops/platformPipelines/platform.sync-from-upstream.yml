@@ -1,0 +1,65 @@
+# This pipeline will:
+#    1. Create a local branch from main
+#    2. Add an upstream remote for https://github.com/NetchexGlobalDev/ResourceModules.git
+#    3. Merge the upstream/main into the new local branch
+#    4. Determine if there are any changes in the new local branch
+#        1. If there are changes, create a pull request from the new local branch to main
+
+name: ".Platform - Sync from Public Upstream"
+
+pr: none
+
+schedules:
+  - cron: "0 12 * * 0"
+    displayName: Weekly Sunday Update
+    branches:
+      include:
+        - main
+
+variables:
+  - template: "../../settings.yml"
+  - name: pipelinePrincipalGitUserName
+    value: "NetchexGlobalDev"
+  - name: pipelinePrincipalGitUserEmail
+    value: "devops@netchexonline.com"
+  - name: upstreamRepository
+    value: "https://github.com/NetchexGlobalDev/ResourceModules.git"
+
+jobs:
+  - job: Sync_From_Upstream
+    pool:
+      ${{ if ne(variables.vmImage, '') }}:
+        vmImage: ${{ variables.vmImage }}
+      ${{ if ne(variables.poolName, '') }}:
+        name: ${{ variables.poolName }}
+    steps:
+      - checkout: self
+        persistCredentials: true
+
+      - task: PowerShell@2
+        displayName: "Merge changes from upstream"
+        inputs:
+          targetType: inline
+          pwsh: true
+          script: |
+            # Configure git to use the pipeline principal
+            git config --global user.name '$(pipelinePrincipalGitUserName)';
+            git config --global user.email '$(pipelinePrincipalGitUserEmail)';
+
+            # Create a new branch from main
+            $NewBranchName = "upstream-sync/$(Get-Date -Format 'yyyyMMdd.HHmmss')";
+            git checkout -b $NewBranchName $(Build.SourceBranchName);
+
+            # Add the upstream remote
+            git remote add -f -t main -m main upstream $(upstreamRepository);
+
+            # Merge the upstream/main into the new branch
+            git merge upstream/main;
+
+            # Add all changes to the new branch
+            git add .;
+
+            # Determine if there are any changes in the new branch
+            git status;
+
+            # git push $(Build.Repository.Uri) HEAD:$(Build.SourceBranch)

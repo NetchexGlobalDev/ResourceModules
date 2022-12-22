@@ -78,7 +78,7 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
-resource appSettings 'Microsoft.Web/sites/config@2020-12-01' = {
+resource appSettings 'Microsoft.Web/sites/config@2022-03-01' = {
   name: 'appsettings'
   kind: kind
   parent: app
