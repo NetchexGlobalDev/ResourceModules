@@ -49,6 +49,10 @@ jobs:
             git config --global user.name '$(pipelinePrincipalGitUserName)';
             git config --global user.email '$(pipelinePrincipalGitUserEmail)';
 
+            git fetch --all
+            git branch -a
+            git checkout -t origin/main
+
             'Create a new branch from main' | Write-Host -Foreground 'Yellow';
             $Timestamp = Get-Date -Format 'yyyyMMdd.HHmmss';
             $NewBranchName = "upstream-sync/$Timestamp";
