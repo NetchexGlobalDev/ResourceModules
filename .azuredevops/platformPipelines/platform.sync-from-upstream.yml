@@ -5,27 +5,27 @@
 #    4. Determine if there are any changes in the new local branch
 #        1. If there are changes, create a pull request from the new local branch to main
 
-name: '.Platform - Sync from Public Upstream'
+name: ".Platform - Sync from Public Upstream"
 
 pr: none
 
 schedules:
-  - cron: '0 12 * * 0'
+  - cron: "0 12 * * 0"
     displayName: Weekly Sunday Update
     branches:
       include:
         - main
 
 variables:
-  - template: '../../settings.yml'
+  - template: "../../settings.yml"
   - name: pipelinePrincipalGitUserName
-    value: 'NetchexGlobalDev'
+    value: "NetchexGlobalDev"
   - name: pipelinePrincipalGitUserEmail
-    value: 'devops@netchexonline.com'
+    value: "devops@netchexonline.com"
   - name: upstreamRepository
-    value: 'https://github.com/NetchexGlobalDev/ResourceModules.git'
+    value: "https://github.com/NetchexGlobalDev/ResourceModules.git"
   - name: organizationName
-    value: 'netchexonline'
+    value: "netchexonline"
 
 jobs:
   - job: Sync_From_Upstream
@@ -39,57 +39,54 @@ jobs:
         persistCredentials: true
 
       - task: PowerShell@2
-        displayName: 'Merge changes from upstream'
+        displayName: "Merge changes from upstream"
         inputs:
           targetType: inline
           pwsh: true
+          verbosePreference: continue
           script: |
-            'Configure git to use the pipeline principal' | Write-Host -Foreground 'Yellow';
+            'Configure git to use the pipeline principal' | Write-Verbose;
             git config --global user.name '$(pipelinePrincipalGitUserName)';
             git config --global user.email '$(pipelinePrincipalGitUserEmail)';
 
-            'List branches' | Write-Host -Foreground 'Yellow';
-            git branch -a;
+            'Checkout main' | Write-Verbose;
+            git checkout main;
 
-            'Fetch all on origin' | Write-Host -Foreground 'Yellow';
-            git fetch --all;
-
-            'List branches' | Write-Host -Foreground 'Yellow';
-            git branch -a;
-
-            'Checkout main' | Write-Host -Foreground 'Yellow';
-            git checkout main; #-t
-
-            'Create a new branch from main' | Write-Host -Foreground 'Yellow';
+            'Create a new branch from main' | Write-Verbose;
             $Timestamp = Get-Date -Format 'yyyyMMdd.HHmmss';
             $NewBranchName = "upstream-sync/$Timestamp";
-            "git checkout -b $NewBranchName main;"
             git checkout -b $NewBranchName main;
 
-            'Add the upstream remote' | Write-Host -Foreground 'Yellow';
+            'Add the upstream remote' | Write-Verbose;
             git remote add -f -t main -m main upstream $(upstreamRepository);
 
-            'Merge the upstream/main into the new branch' | Write-Host -Foreground 'Yellow';
-            git merge upstream/main --allow-unrelated-histories --no-ff;
+            'Merge the upstream/main into the new branch' | Write-Verbose;
+            git merge upstream/main; # --allow-unrelated-histories --no-ff
 
-            'Add all changes to the new branch' | Write-Host -Foreground 'Yellow';
+            'Add all changes to the new branch' | Write-Verbose;
             git add .;
 
-            'Determine if there are any changes in the new branch' | Write-Host -Foreground 'Yellow';
+            'Commit to the new branch' | Write-Verbose;
+            git commit -m "Upstream Merge: $Timestamp";
+
+            'Determine if there are any changes in the new branch' | Write-Verbose;
             git status;
 
-            'Publish new branch' | Write-Host -Foreground 'Yellow';
+            'Publish new branch' | Write-Verbose;
             git push origin;
 
-            'Connect to Azure DevOps' | Write-Host -Foreground 'Yellow';
+            Install-Module -Name 'VSTeam' -Scope 'CurrentUser';
+            Import-Module -Name 'VSTeam';
+
+            'Connect to Azure DevOps' | Write-Verbose;
             Set-VSTeamAccount -Account '$(organizationName)' -Token '$(System.AccessToken)' -UseBearerToken;
 
-            'Get Repository' | Write-Host -Foreground 'Yellow';
+            'Get Repository' | Write-Verbose;
             $Repository = Get-VSTeamGitRepository -ProjectName '$(System.TeamProject)' -Name '$(Build.Repository.Name)';
 
             $Repository;
 
-            'Create Pull Request' | Write-Host -Foreground 'Yellow';
+            'Create Pull Request' | Write-Verbose;
             Add-VSTeamPullRequest `
               -ProjectName '$(System.TeamProject)' `
               -RepositoryId $(Build.Repository.ID) `
