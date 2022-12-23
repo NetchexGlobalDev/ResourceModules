@@ -52,13 +52,14 @@ jobs:
             'Create a new branch from main' | Write-Host -Foreground 'Yellow';
             $Timestamp = Get-Date -Format 'yyyyMMdd.HHmmss';
             $NewBranchName = "upstream-sync/$Timestamp";
-            git checkout -b $NewBranchName $(Build.SourceBranchName);
+            "git checkout -b $NewBranchName main;"
+            git checkout -b $NewBranchName main;
 
             'Add the upstream remote' | Write-Host -Foreground 'Yellow';
             git remote add -f -t main -m main upstream $(upstreamRepository);
 
             'Merge the upstream/main into the new branch' | Write-Host -Foreground 'Yellow';
-            git merge upstream/main;
+            git merge upstream/main --allow-unrelated-histories --no-ff;
 
             'Add all changes to the new branch' | Write-Host -Foreground 'Yellow';
             git add .;
