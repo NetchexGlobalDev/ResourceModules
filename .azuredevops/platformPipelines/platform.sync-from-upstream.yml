@@ -43,58 +43,63 @@ jobs:
         inputs:
           targetType: inline
           pwsh: true
-          verbosePreference: continue
           script: |
-            'Configure git to use the pipeline principal' | Write-Verbose;
+            'Configure git to use the pipeline principal' | Write-Verbose -Verbose;
             git config --global user.name '$(pipelinePrincipalGitUserName)';
             git config --global user.email '$(pipelinePrincipalGitUserEmail)';
 
-            'Fetch all on origin' | Write-Host -Foreground 'Yellow';
+            'Fetch all on origin' | Write-Verbose -Verbose;
             git fetch --all;
 
-            'Checkout main' | Write-Verbose;
+            'Checkout main' | Write-Verbose -Verbose;
             git checkout main;
 
-            'Create a new branch from main' | Write-Verbose;
+            'Create a new branch from main' | Write-Verbose -Verbose;
             $Timestamp = Get-Date -Format 'yyyyMMdd.HHmmss';
             $NewBranchName = "upstream-sync/$Timestamp";
             git checkout -b $NewBranchName main;
 
-            'Add the upstream remote' | Write-Verbose;
+            'Add the upstream remote' | Write-Verbose -Verbose;
             git remote add -f -t main -m main upstream $(upstreamRepository);
 
-            'Merge the upstream/main into the new branch' | Write-Verbose;
+            'Merge the upstream/main into the new branch' | Write-Verbose -Verbose;
             git merge upstream/main --allow-unrelated-histories --no-ff;
 
-            'Add all changes to the new branch' | Write-Verbose;
-            git add .;
+            'Determine if there are any changes in the new branch' | Write-Verbose -Verbose;
+            $Status = git status --porcelain;
 
-            'Commit to the new branch' | Write-Verbose;
-            git commit -m "Upstream Merge: $Timestamp";
+            if ($null -ne $Status)
+            {
+              'Add all changes to the new branch' | Write-Verbose -Verbose;
+              git add .;
 
-            'Determine if there are any changes in the new branch' | Write-Verbose;
-            git status;
+              'Commit to the new branch' | Write-Verbose -Verbose;
+              git commit -m "Upstream Merge: $Timestamp";
 
-            'Publish new branch' | Write-Verbose;
-            git push origin;
+              'Publish new branch' | Write-Verbose -Verbose;
+              # git push origin;
+              git push --set-upstream origin $NewBranchName;
+            }
+            else
+            {
+              'No changes to commit' | Write-Verbose -Verbose;
+            }
 
-            Install-Module -Name 'VSTeam' -Force -Verbose:$false;
-            Import-Module -Name 'VSTeam' -Verbose:$false;
+            Install-Module -Name 'VSTeam' -Force;
+            Import-Module -Name 'VSTeam';
 
-            'Connect to Azure DevOps' | Write-Verbose;
-            Set-VSTeamAccount -Account '$(organizationName)' -Token '$(System.AccessToken)' -UseBearerToken -Verbose:$false;
+            'Connect to Azure DevOps' | Write-Verbose -Verbose;
+            Set-VSTeamAccount -Account '$(organizationName)' -Token '$(System.AccessToken)' -UseBearerToken;
 
-            'Get Repository' | Write-Verbose;
-            $Repository = Get-VSTeamGitRepository -ProjectName '$(System.TeamProject)' -Name '$(Build.Repository.Name)' -Verbose:$false;
+            'Get Repository' | Write-Verbose -Verbose;
+            $Repository = Get-VSTeamGitRepository -ProjectName '$(System.TeamProject)' -Name '$(Build.Repository.Name)';
 
-            $Repository;
-
-            'Create Pull Request' | Write-Verbose;
-            Add-VSTeamPullRequest -Verbose:$false `
-              -ProjectName '$(System.TeamProject)' `
-              -RepositoryId $(Build.Repository.ID) `
-              -SourceRefName "refs/heads/$NewBranchName" `
-              -TargetRefName 'refs/heads/main' `
-              -Title "Upstream Merge: $Timestamp" `
-              -Description "Upstream Merge: $Timestamp"
-              # ` -Draft
+            'Create Pull Request' | Write-Verbose -Verbose;
+            # Add-VSTeamPullRequest `
+            #   -ProjectName '$(System.TeamProject)' `
+            #   -RepositoryId $(Build.Repository.ID) `
+            #   -SourceRefName "refs/heads/$NewBranchName" `
+            #   -TargetRefName 'refs/heads/main' `
+            #   -Title "Upstream Merge: $Timestamp" `
+            #   -Description "Upstream Merge: $Timestamp"
+            #   # ` -Draft
