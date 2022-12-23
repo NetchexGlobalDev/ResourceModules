@@ -49,14 +49,8 @@ jobs:
             git config --global user.name '$(pipelinePrincipalGitUserName)';
             git config --global user.email '$(pipelinePrincipalGitUserEmail)';
 
-            'List branches' | Write-Host -Foreground 'Yellow';
-            git branch -a;
-
             'Fetch all on origin' | Write-Host -Foreground 'Yellow';
             git fetch --all;
-
-            'List branches' | Write-Host -Foreground 'Yellow';
-            git branch -a;
 
             'Checkout main' | Write-Verbose;
             git checkout main;
@@ -84,19 +78,19 @@ jobs:
             'Publish new branch' | Write-Verbose;
             git push origin;
 
-            Install-Module -Name 'VSTeam' -Scope 'CurrentUser';
-            Import-Module -Name 'VSTeam';
+            Install-Module -Name 'VSTeam' -Force -Verbose:$false;
+            Import-Module -Name 'VSTeam' -Verbose:$false;
 
             'Connect to Azure DevOps' | Write-Verbose;
-            Set-VSTeamAccount -Account '$(organizationName)' -Token '$(System.AccessToken)' -UseBearerToken;
+            Set-VSTeamAccount -Account '$(organizationName)' -Token '$(System.AccessToken)' -UseBearerToken -Verbose:$false;
 
             'Get Repository' | Write-Verbose;
-            $Repository = Get-VSTeamGitRepository -ProjectName '$(System.TeamProject)' -Name '$(Build.Repository.Name)';
+            $Repository = Get-VSTeamGitRepository -ProjectName '$(System.TeamProject)' -Name '$(Build.Repository.Name)' -Verbose:$false;
 
             $Repository;
 
             'Create Pull Request' | Write-Verbose;
-            Add-VSTeamPullRequest `
+            Add-VSTeamPullRequest -Verbose:$false `
               -ProjectName '$(System.TeamProject)' `
               -RepositoryId $(Build.Repository.ID) `
               -SourceRefName "refs/heads/$NewBranchName" `
