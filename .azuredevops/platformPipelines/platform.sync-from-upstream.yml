@@ -49,6 +49,9 @@ jobs:
             git config --global user.name '$(pipelinePrincipalGitUserName)';
             git config --global user.email '$(pipelinePrincipalGitUserEmail)';
 
+            'List branches' | Write-Host -Foreground 'Yellow';
+            git branch -a;
+
             'Fetch all on origin' | Write-Host -Foreground 'Yellow';
             git fetch --all;
 
