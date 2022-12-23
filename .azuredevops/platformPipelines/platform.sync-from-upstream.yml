@@ -24,6 +24,8 @@ variables:
     value: 'devops@netchexonline.com'
   - name: upstreamRepository
     value: 'https://github.com/NetchexGlobalDev/ResourceModules.git'
+  - name: organizationName
+    value: 'netchexonline'
 
 jobs:
   - job: Sync_From_Upstream
@@ -43,25 +45,44 @@ jobs:
           targetType: inline
           pwsh: true
           script: |
-            # Configure git to use the pipeline principal
+            'Configure git to use the pipeline principal' | Write-Host -Foreground 'Yellow';
             git config --global user.name '$(pipelinePrincipalGitUserName)';
             git config --global user.email '$(pipelinePrincipalGitUserEmail)';
 
-            # Create a new branch from main
-            $NewBranchName = "upstream-sync/$(Get-Date -Format 'yyyyMMdd.HHmmss')";
+            'Create a new branch from main' | Write-Host -Foreground 'Yellow';
+            $Timestamp = Get-Date -Format 'yyyyMMdd.HHmmss';
+            $NewBranchName = "upstream-sync/$Timestamp";
             git checkout -b $NewBranchName $(Build.SourceBranchName);
 
-            # Add the upstream remote
+            'Add the upstream remote' | Write-Host -Foreground 'Yellow';
             git remote add -f -t main -m main upstream $(upstreamRepository);
 
-            # Merge the upstream/main into the new branch
+            'Merge the upstream/main into the new branch' | Write-Host -Foreground 'Yellow';
             git merge upstream/main;
 
-            # Add all changes to the new branch
+            'Add all changes to the new branch' | Write-Host -Foreground 'Yellow';
             git add .;
 
-            # Determine if there are any changes in the new branch
+            'Determine if there are any changes in the new branch' | Write-Host -Foreground 'Yellow';
             git status;
 
-            # Publish new branch
+            'Publish new branch' | Write-Host -Foreground 'Yellow';
             git push origin;
+
+            'Connect to Azure DevOps' | Write-Host -Foreground 'Yellow';
+            Set-VSTeamAccount -Account '$(organizationName)' -Token '$(System.AccessToken)' -UseBearerToken;
+
+            'Get Repository' | Write-Host -Foreground 'Yellow';
+            $Repository = Get-VSTeamGitRepository -ProjectName '$(System.TeamProject)' -Name '$(Build.Repository.Name)';
+
+            $Repository;
+
+            'Create Pull Request' | Write-Host -Foreground 'Yellow';
+            Add-VSTeamPullRequest `
+              -ProjectName '$(System.TeamProject)' `
+              -RepositoryId $(Build.Repository.ID) `
+              -SourceRefName "refs/heads/$NewBranchName" `
+              -TargetRefName 'refs/heads/main' `
+              -Title "Upstream Merge: $Timestamp" `
+              -Description "Upstream Merge: $Timestamp"
+              # ` -Draft
