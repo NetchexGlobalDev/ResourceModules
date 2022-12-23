@@ -36,7 +36,6 @@ jobs:
         name: ${{ variables.poolName }}
     steps:
       - checkout: self
-        clean: true
         persistCredentials: true
 
       - task: PowerShell@2
@@ -59,7 +58,7 @@ jobs:
             git branch -a;
 
             'Checkout main' | Write-Host -Foreground 'Yellow';
-            git checkout origin/main; #-t
+            git checkout main; #-t
 
             'Create a new branch from main' | Write-Host -Foreground 'Yellow';
             $Timestamp = Get-Date -Format 'yyyyMMdd.HHmmss';
