@@ -61,7 +61,7 @@ jobs:
             git remote add -f -t main -m main upstream $(upstreamRepository);
 
             'Merge the upstream/main into the new branch' | Write-Verbose;
-            git merge upstream/main; # --allow-unrelated-histories --no-ff
+            git merge upstream/main --allow-unrelated-histories; # --no-ff
 
             'Add all changes to the new branch' | Write-Verbose;
             git add .;
