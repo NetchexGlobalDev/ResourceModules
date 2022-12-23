@@ -59,7 +59,7 @@ jobs:
             git branch -a;
 
             'Checkout main' | Write-Host -Foreground 'Yellow';
-            git checkout -t origin/main;
+            git checkout origin/main; #-t
 
             'Create a new branch from main' | Write-Host -Foreground 'Yellow';
             $Timestamp = Get-Date -Format 'yyyyMMdd.HHmmss';
