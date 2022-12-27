@@ -5,27 +5,29 @@
 #    4. Determine if there are any changes in the new local branch
 #        1. If there are changes, create a pull request from the new local branch to main
 
-name: ".Platform - Sync from Public Upstream"
+name: '.Platform - Sync from Public Upstream'
 
 pr: none
 
 schedules:
-  - cron: "0 12 * * 0"
+  - cron: '0 12 * * 0'
     displayName: Weekly Sunday Update
     branches:
       include:
         - main
+      exclude:
+        - upstream-sync/*
 
 variables:
-  - template: "../../settings.yml"
+  - template: '../../settings.yml'
   - name: pipelinePrincipalGitUserName
-    value: "NetchexGlobalDev"
+    value: 'NetchexGlobalDev'
   - name: pipelinePrincipalGitUserEmail
-    value: "devops@netchexonline.com"
+    value: 'devops@netchexonline.com'
   - name: upstreamRepository
-    value: "https://github.com/NetchexGlobalDev/ResourceModules.git"
+    value: 'https://github.com/NetchexGlobalDev/ResourceModules.git'
   - name: organizationName
-    value: "netchexonline"
+    value: 'netchexonline'
 
 jobs:
   - job: Sync_From_Upstream
@@ -39,7 +41,7 @@ jobs:
         persistCredentials: true
 
       - task: PowerShell@2
-        displayName: "Merge changes from upstream"
+        displayName: 'Merge changes from upstream'
         inputs:
           targetType: inline
           pwsh: true
