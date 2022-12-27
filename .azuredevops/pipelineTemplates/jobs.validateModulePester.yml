@@ -176,6 +176,9 @@ jobs:
               Run        = @{
                   Container = New-PesterContainer -Path (Join-Path $repoRootPath $moduleTestFilePath) -Data $testContainerData
               }
+              Filter     = @{
+                  ExcludeTag  = 'Readme'
+              }
               TestResult = @{
                 TestSuiteName = 'Module Tests'
                 OutputPath    = $outputPath

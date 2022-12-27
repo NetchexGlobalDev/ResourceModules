@@ -1,0 +1,108 @@
+# This pipeline will:
+#    1. Create a local branch from main
+#    2. Add an upstream remote for https://github.com/NetchexGlobalDev/ResourceModules.git
+#    3. Merge the upstream/main into the new local branch
+#    4. Determine if there are any changes in the new local branch
+#        1. If there are changes, create a pull request from the new local branch to main
+
+name: '.Platform - Sync from Public Upstream'
+
+pr: none
+
+schedules:
+  - cron: '0 12 * * 0'
+    displayName: Weekly Sunday Update
+    branches:
+      include:
+        - main
+      exclude:
+        - upstream-sync/*
+
+variables:
+  - template: '../../settings.yml'
+  - name: pipelinePrincipalGitUserName
+    value: 'NetchexGlobalDev'
+  - name: pipelinePrincipalGitUserEmail
+    value: 'devops@netchexonline.com'
+  - name: upstreamRepository
+    value: 'https://github.com/NetchexGlobalDev/ResourceModules.git'
+  - name: organizationName
+    value: 'netchexonline'
+
+jobs:
+  - job: Sync_From_Upstream
+    pool:
+      ${{ if ne(variables.vmImage, '') }}:
+        vmImage: ${{ variables.vmImage }}
+      ${{ if ne(variables.poolName, '') }}:
+        name: ${{ variables.poolName }}
+    steps:
+      - checkout: self
+        persistCredentials: true
+
+      - task: PowerShell@2
+        displayName: 'Merge changes from upstream'
+        inputs:
+          targetType: inline
+          pwsh: true
+          script: |
+            'Configure git to use the pipeline principal' | Write-Verbose -Verbose;
+            git config --global user.name '$(pipelinePrincipalGitUserName)';
+            git config --global user.email '$(pipelinePrincipalGitUserEmail)';
+
+            'Fetch all on origin' | Write-Verbose -Verbose;
+            git fetch --all;
+
+            'Checkout main' | Write-Verbose -Verbose;
+            git checkout main;
+
+            'Create a new branch from main' | Write-Verbose -Verbose;
+            $Timestamp = Get-Date -Format 'yyyyMMdd.HHmmss';
+            $NewBranchName = "upstream-sync/$Timestamp";
+            git checkout -b $NewBranchName main;
+
+            'Add the upstream remote' | Write-Verbose -Verbose;
+            git remote add -f -t main -m main upstream $(upstreamRepository);
+
+            'Merge the upstream/main into the new branch' | Write-Verbose -Verbose;
+            git merge upstream/main --allow-unrelated-histories --no-ff;
+
+            'Determine if there are any changes in the new branch' | Write-Verbose -Verbose;
+            $Status = git status --porcelain;
+
+            if ($null -ne $Status)
+            {
+              'Add all changes to the new branch' | Write-Verbose -Verbose;
+              git add .;
+
+              'Commit to the new branch' | Write-Verbose -Verbose;
+              git commit -m "Upstream Merge: $Timestamp";
+
+              'Publish new branch' | Write-Verbose -Verbose;
+              # git push origin;
+              git push --set-upstream origin $NewBranchName;
+            }
+            else
+            {
+              'No changes to commit' | Write-Verbose -Verbose;
+            }
+
+            Install-Module -Name 'VSTeam' -Force;
+            Import-Module -Name 'VSTeam';
+
+            'Connect to Azure DevOps' | Write-Verbose -Verbose;
+            Set-VSTeamAccount -Account '$(organizationName)' -Token '$(System.AccessToken)' -UseBearerToken;
+
+            'Get Repository' | Write-Verbose -Verbose;
+            $Repository = Get-VSTeamGitRepository -ProjectName '$(System.TeamProject)' -Name '$(Build.Repository.Name)';
+
+            'Create Pull Request' | Write-Verbose -Verbose;
+            Add-VSTeamPullRequest `
+                -ProjectName '$(System.TeamProject)' `
+                -RepositoryId $(Build.Repository.ID) `
+                -SourceRefName "refs/heads/$NewBranchName" `
+                -TargetRefName 'refs/heads/main' `
+                -Title "Upstream Merge: $Timestamp" `
+                -Description ("Please do not merge this pull request until the following tasks are complete:`n- [ ] " +
+                    "Review changes. If any changes are in fact merge conflicts, please complete the merge manually.") `
+                -Draft;
