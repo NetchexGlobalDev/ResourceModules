@@ -1,4 +1,4 @@
-name: Sync Upstream
+name: '.Platform: Sync Upstream'
 
 # This runs every day on 1801 UTC
 on:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: GitHub Sync to Upstream Repository
         uses: rovast/sync-upstream-repo@v0.0.1
-        with: 
+        with:
           upstream_repo: https://github.com/Azure/ResourceModules
           upstream_branch: main
           downstream_branch: main
