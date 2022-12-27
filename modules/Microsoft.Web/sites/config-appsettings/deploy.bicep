@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // Trigger Deploy: 2022-12-15 15:07:15
+=======
+>>>>>>> upstream/main
 // ================ //
 // Parameters       //
 // ================ //
@@ -78,7 +81,11 @@ resource defaultTelemetry 'Microsoft.Resources/deployments@2021-04-01' = if (ena
   }
 }
 
+<<<<<<< HEAD
 resource appSettings 'Microsoft.Web/sites/config@2022-03-01' = {
+=======
+resource appSettings 'Microsoft.Web/sites/config@2020-12-01' = {
+>>>>>>> upstream/main
   name: 'appsettings'
   kind: kind
   parent: app

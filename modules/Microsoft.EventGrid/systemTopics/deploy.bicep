@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // Trigger Deploy: 2022-12-20 14:22:32
+=======
+>>>>>>> upstream/main
 @description('Required. The name of the Event Grid Topic.')
 param name string
 
