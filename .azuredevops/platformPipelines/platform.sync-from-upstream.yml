@@ -65,7 +65,7 @@ jobs:
             git remote add -f -t main -m main upstream $(upstreamRepository);
 
             'Merge the upstream/main into the new branch' | Write-Verbose -Verbose;
-            git merge upstream/main --allow-unrelated-histories --no-ff;
+            git merge upstream/main --allow-unrelated-histories --no-ff --strategy octopus;
 
             'Determine if there are any changes in the new branch' | Write-Verbose -Verbose;
             $Status = git status --porcelain;
@@ -79,30 +79,29 @@ jobs:
               git commit -m "Upstream Merge: $Timestamp";
 
               'Publish new branch' | Write-Verbose -Verbose;
-              # git push origin;
               git push --set-upstream origin $NewBranchName;
+
+              Install-Module -Name 'VSTeam' -Force;
+              Import-Module -Name 'VSTeam';
+
+              'Connect to Azure DevOps' | Write-Verbose -Verbose;
+              Set-VSTeamAccount -Account '$(organizationName)' -Token '$(System.AccessToken)' -UseBearerToken;
+
+              'Get Repository' | Write-Verbose -Verbose;
+              $Repository = Get-VSTeamGitRepository -ProjectName '$(System.TeamProject)' -Name '$(Build.Repository.Name)';
+
+              'Create Pull Request' | Write-Verbose -Verbose;
+              Add-VSTeamPullRequest `
+                  -ProjectName '$(System.TeamProject)' `
+                  -RepositoryId $(Build.Repository.ID) `
+                  -SourceRefName "refs/heads/$NewBranchName" `
+                  -TargetRefName 'refs/heads/main' `
+                  -Title "Upstream Merge: $Timestamp" `
+                  -Description ("Please do not merge this pull request until the following tasks are complete:`n- [ ] " +
+                      "Review changes. If any changes are in fact merge conflicts, please complete the merge manually.") `
+                  -Draft;
             }
             else
             {
               'No changes to commit' | Write-Verbose -Verbose;
             }
-
-            Install-Module -Name 'VSTeam' -Force;
-            Import-Module -Name 'VSTeam';
-
-            'Connect to Azure DevOps' | Write-Verbose -Verbose;
-            Set-VSTeamAccount -Account '$(organizationName)' -Token '$(System.AccessToken)' -UseBearerToken;
-
-            'Get Repository' | Write-Verbose -Verbose;
-            $Repository = Get-VSTeamGitRepository -ProjectName '$(System.TeamProject)' -Name '$(Build.Repository.Name)';
-
-            'Create Pull Request' | Write-Verbose -Verbose;
-            Add-VSTeamPullRequest `
-                -ProjectName '$(System.TeamProject)' `
-                -RepositoryId $(Build.Repository.ID) `
-                -SourceRefName "refs/heads/$NewBranchName" `
-                -TargetRefName 'refs/heads/main' `
-                -Title "Upstream Merge: $Timestamp" `
-                -Description ("Please do not merge this pull request until the following tasks are complete:`n- [ ] " +
-                    "Review changes. If any changes are in fact merge conflicts, please complete the merge manually.") `
-                -Draft;
