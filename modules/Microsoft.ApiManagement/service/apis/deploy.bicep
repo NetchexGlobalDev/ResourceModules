@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// Trigger Deploy: 2022-12-20 14:22:32
-=======
->>>>>>> upstream/main
 @description('Required. API revision identifier. Must be unique in the current API Management service instance. Non-current revision has ;rev=n as a suffix where n is the revision number.')
 param name string
 

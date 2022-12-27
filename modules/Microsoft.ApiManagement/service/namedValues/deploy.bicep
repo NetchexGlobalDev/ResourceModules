@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-// Trigger Deploy: 2022-12-20 14:22:32
-=======
->>>>>>> upstream/main
 @description('Conditional. The name of the parent API Management service. Required if the template is used in a standalone deployment.')
 param apiManagementServiceName string = ''
 
