@@ -13,11 +13,7 @@ variables:
 
   # the 'localToken_' prefix will be removed from the key name when the pipelines run.
   # e.g. if you have a token in your parameter file as <<customKey>>, then the token defined in this file looks like "localToken_customKey": 'value'
-<<<<<<< HEAD
   localToken_namePrefix: 'ncx' # A 3-5 character length unique string, included in the resources names (e.g. 'cntso'). Used for local module testing and pipelines.
-=======
-  localToken_namePrefix: '' # A 3-5 character length unique string, included in the resources names (e.g. 'cntso'). Used for local module testing and pipelines.
->>>>>>> upstream/main
 
   # this determines the starting prefix and ending suffix of the token in your file.
   tokenPrefix: '<<'
@@ -48,11 +44,7 @@ variables:
   # Deployment validation #
   # --------------------- #
 
-<<<<<<< HEAD
   location: 'South Central US' # The default location to test deploy resources to
-=======
-  location: 'West Europe' # The default location to test deploy resources to
->>>>>>> upstream/main
 
   #############################
   ##   Publishing settings   ##
@@ -67,13 +59,8 @@ variables:
   # ---------------------- #
 
   templateSpecsDoPublish: true # Set to true, if you would like to publish module templates as template specs
-<<<<<<< HEAD
   templateSpecsRGName: 'ncx-devops-envdistillery-specs' # The name of the resource group to publish to. If the resource group does not exist, it will be created.
   templateSpecsRGLocation: 'South Central US' # The location of the resource group to publish to
-=======
-  templateSpecsRGName: 'artifacts-rg' # The name of the resource group to publish to. If the resource group does not exist, it will be created.
-  templateSpecsRGLocation: 'West Europe' # The location of the resource group to publish to
->>>>>>> upstream/main
   templateSpecsDescription: components # The description to add to template specs published by this platform
 
   # ------------------------------- #
@@ -81,15 +68,9 @@ variables:
   # ------------------------------- #
 
   bicepRegistryDoPublish: true # Set to true, if you would like to publish module templates to a bicep registry
-<<<<<<< HEAD
   bicepRegistryName: ncxdevopsacr # The name of the bicep registry (ACR) to publish to. If it does not exist, it will be created.
   bicepRegistryRGName: 'ncx-devops-envdistillery' # The resource group that hosts the private bicep registry (ACR)
   bicepRegistryRgLocation: 'South Central US' # The location of the resource group to publish to
-=======
-  bicepRegistryName: adpsxxazacrx001 # The name of the bicep registry (ACR) to publish to. If it does not exist, it will be created.
-  bicepRegistryRGName: 'artifacts-rg' # The resource group that hosts the private bicep registry (ACR)
-  bicepRegistryRgLocation: 'West Europe' # The location of the resource group to publish to
->>>>>>> upstream/main
 
   ###########################################################################################################################
   ################################################## Azure DevOps Only ######################################################
@@ -99,11 +80,7 @@ variables:
   ##   Connection settings   ##
   #############################
 
-<<<<<<< HEAD
   serviceConnection: 'Ncx.DevQA'
-=======
-  serviceConnection: 'CARML-CSU-Tenant-Connection'
->>>>>>> upstream/main
 
   ################
   ##   Source   ##
@@ -114,10 +91,6 @@ variables:
   modulesRepository: ResourceModules # The repository hosting the deployment code (i.e. 'Components'). MUST be provided as a variable with every pipeline
   pipelineFunctionsPath: 'utilities/pipelines'
 
-<<<<<<< HEAD
-=======
-
->>>>>>> upstream/main
   #############################
   ##   Publishing settings   ##
   #############################
@@ -126,11 +99,7 @@ variables:
   # --------------------------- #
 
   artifactsFeedDoPublish: true # Set to true, if you would like to publish modules as Universal Packages (in Azure DevOps Artifacts)
-<<<<<<< HEAD
   vstsFeedName: 'InfrastructureResourceModules' # The name of the Azure DevOps universal packages feed to publish to
-=======
-  vstsFeedName: 'carml' # The name of the Azure DevOps universal packages feed to publish to
->>>>>>> upstream/main
   vstsFeedProject: '$(System.TeamProject)' # The project that hosts the feed
   vstsFeedToken: $(System.AccessToken) # The token used to publish universal packages into the feed above
 
