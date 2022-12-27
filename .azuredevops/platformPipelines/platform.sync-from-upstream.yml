@@ -8,6 +8,7 @@
 name: '.Platform - Sync from Public Upstream'
 
 pr: none
+trigger: none
 
 schedules:
   - cron: '0 12 * * 0'
@@ -15,8 +16,6 @@ schedules:
     branches:
       include:
         - main
-      exclude:
-        - upstream-sync/*
 
 variables:
   - template: '../../settings.yml'
@@ -65,12 +64,20 @@ jobs:
             git remote add -f -t main -m main upstream $(upstreamRepository);
 
             'Merge the upstream/main into the new branch' | Write-Verbose -Verbose;
-            git merge upstream/main --allow-unrelated-histories --no-ff --strategy octopus;
+            git merge upstream/main --allow-unrelated-histories --no-ff; # --strategy octopus
 
             'Determine if there are any changes in the new branch' | Write-Verbose -Verbose;
             $Status = git status --porcelain;
 
-            if ($null -ne $Status)
+            'git status --procelain' | Write-Verbose -Verbose;
+            $Status
+
+            $DiffNumStat = "git diff $NewBranchName..upstream/main --numstat" | Invoke-Expression;
+
+            "git diff $NewBranchName..upstream/main --numstat" | Write-Verbose -Verbose;
+            $DiffNumStat
+
+            if ($null -ne $Status -or $null -ne $DiffNumStat)
             {
               'Add all changes to the new branch' | Write-Verbose -Verbose;
               git add .;
