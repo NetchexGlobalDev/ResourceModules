@@ -70,8 +70,8 @@ jobs:
             'Determine if there are any changes in the new branch' | Write-Verbose -Verbose;
             $Status = git status --porcelain;
 
-            if ($null -ne $Status)
-            {
+            # if ($null -ne $Status)
+            # {
               'Add all changes to the new branch' | Write-Verbose -Verbose;
               git add .;
 
@@ -100,8 +100,8 @@ jobs:
                   -Description ("Please do not merge this pull request until the following tasks are complete:`n- [ ] " +
                       "Review changes. If any changes are in fact merge conflicts, please complete the merge manually.") `
                   -Draft;
-            }
-            else
-            {
-              'No changes to commit' | Write-Verbose -Verbose;
-            }
+            # }
+            # else
+            # {
+            #   'No changes to commit' | Write-Verbose -Verbose;
+            # }
