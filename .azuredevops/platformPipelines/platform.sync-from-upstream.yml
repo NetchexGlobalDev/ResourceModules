@@ -69,7 +69,7 @@ jobs:
             'Determine if there are any changes in the new branch' | Write-Verbose -Verbose;
             $Status = git status --porcelain;
 
-            'git status --procelain' | Write-Verbose -Verbose;
+            'git status --porcelain' | Write-Verbose -Verbose;
             $Status
 
             $DiffNumStat = "git diff $NewBranchName..origin/main --numstat" | Invoke-Expression;
