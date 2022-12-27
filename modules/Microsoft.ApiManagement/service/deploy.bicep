@@ -1,4 +1,3 @@
-// Trigger Deploy: 2022-12-20 14:22:32
 @description('Optional. Additional datacenter locations of the API Management service.')
 param additionalLocations array = []
 

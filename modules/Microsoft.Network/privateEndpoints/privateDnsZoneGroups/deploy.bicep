@@ -1,4 +1,3 @@
-// Trigger Deploy: 2022-12-15 12:32:10
 @description('Conditional. The name of the parent private endpoint. Required if the template is used in a standalone deployment.')
 param privateEndpointName string
 

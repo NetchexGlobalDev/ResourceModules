@@ -1,4 +1,3 @@
-// Trigger Deploy: 2022-12-15 12:32:10
 @description('Required. Name of the private endpoint resource to create.')
 param name string
 
