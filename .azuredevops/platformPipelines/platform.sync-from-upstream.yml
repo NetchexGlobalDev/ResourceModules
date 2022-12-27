@@ -74,7 +74,7 @@ jobs:
 
             $DiffNumStat = "git diff $NewBranchName..upstream/main --numstat" | Invoke-Expression;
 
-            "git diff $NewBranchName..upstream/main --numstat" | Write-Verbose -Verbose;
+            "git diff $NewBranchName..origin/main --numstat" | Write-Verbose -Verbose;
             $DiffNumStat
 
             if ($null -ne $Status -or $null -ne $DiffNumStat)
