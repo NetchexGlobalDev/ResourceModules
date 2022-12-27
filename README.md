@@ -176,18 +176,8 @@ Modules provided in this library have telemetry enabled by default. To learn mor
 <!-- References -->
 
 <!-- Local -->
-<<<<<<< HEAD
-[GitHubDocs]: <https://docs.github.com/>
-[AzureIcon]: docs/media/MicrosoftAzure-32px.png
 
 <!-- External -->
-[Bicep]: <https://github.com/Azure/bicep>
-[AzureResourceManager]: <https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/overview>
-=======
-
-<!-- External -->
-
->>>>>>> upstream/main
 
 <!-- Docs -->
 [MicrosoftAzureDocs]: <https://docs.microsoft.com/en-us/azure/>
