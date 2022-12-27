@@ -72,7 +72,7 @@ jobs:
             'git status --procelain' | Write-Verbose -Verbose;
             $Status
 
-            $DiffNumStat = "git diff $NewBranchName..upstream/main --numstat" | Invoke-Expression;
+            $DiffNumStat = "git diff $NewBranchName..origin/main --numstat" | Invoke-Expression;
 
             "git diff $NewBranchName..origin/main --numstat" | Write-Verbose -Verbose;
             $DiffNumStat
